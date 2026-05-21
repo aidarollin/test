@@ -111,7 +111,7 @@ export class StartScene extends Phaser.Scene {
     const cx = width / 2;
     const my = height * 0.5;
 
-    const pbot = this.add.image(cx, my, 'pbot').setScale(0.56);
+    const pbot = this.add.image(cx, my, 'pbot').setScale(0.96);
     this.tweens.add({
       targets: pbot,
       y: my - 18,
