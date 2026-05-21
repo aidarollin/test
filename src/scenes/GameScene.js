@@ -3,8 +3,8 @@ import { addMuteButton } from '../muteButton.js';
 
 const FLOOR_HEIGHT       = 80;
 const HUD_HEIGHT         = 70;
-const PBOT_SCALE         = 0.20;
-const PBOT_START_X       = 130;
+const SMILEY_SCALE         = 0.20;
+const SMILEY_START_X       = 130;
 const PIPE_MIN_TOP       = 90;    // min y for bottom edge of top pipe
 const PIPE_BOTTOM_MARGIN = 60;    // min px between pipe gap and the floor
 
@@ -59,7 +59,7 @@ export class GameScene extends Phaser.Scene {
 
     this._drawBackground();
     this._createFloorAndCeiling();
-    this._createPbot();
+    this._createSmiley();
     this._createGroups();
     this._createHud();
     this._updateHud();   // show carried score + remaining budget before the tap
@@ -98,10 +98,10 @@ export class GameScene extends Phaser.Scene {
       const bgSpeed = this._ramp(DIFFICULTY.pipeSpeed) * BG_SCROLL_FACTOR * bgBoost;
       this.bg.tilePositionX += bgSpeed * (deltaMs / 1000) / this.bg.tileScaleX;
 
-      // tilt pbot toward velocity for a satisfying arc
-      const vy = this.pbot.body.velocity.y;
+      // tilt smiley toward velocity for a satisfying arc
+      const vy = this.smiley.body.velocity.y;
       const target = Phaser.Math.Clamp(vy * 0.08, -25, 70);
-      this.pbot.angle += (target - this.pbot.angle) * 0.1;
+      this.smiley.angle += (target - this.smiley.angle) * 0.1;
 
       // cleanup off-screen obstacles + sushi (kill tweens first so the
       // spin/bob loops don't outlive the sprite)
@@ -115,7 +115,7 @@ export class GameScene extends Phaser.Scene {
       this._updatePowerups(deltaMs);
       this._updateMagnetPull();
 
-      // power-rush speed trail — faint red afterimages of pbot
+      // power-rush speed trail — faint red afterimages of smiley
       if (this.rushActive) {
         this.rushTrailAcc += deltaMs;
         if (this.rushTrailAcc >= 70) {
@@ -170,35 +170,35 @@ export class GameScene extends Phaser.Scene {
     // give the floor visual a static physics body for collision
     this.physics.add.existing(this.floor, true);
 
-    // invisible ceiling just to prevent pbot escaping up
+    // invisible ceiling just to prevent smiley escaping up
     this.ceiling = this.add.rectangle(width / 2, -10, width, 20, 0x000000, 0);
     this.physics.add.existing(this.ceiling, true);
   }
 
-  _createPbot() {
-    this.pbot = this.physics.add.image(PBOT_START_X, this.scale.height * 0.45, 'pbot')
-      .setScale(PBOT_SCALE);
+  _createSmiley() {
+    this.smiley = this.physics.add.image(SMILEY_START_X, this.scale.height * 0.45, 'smiley')
+      .setScale(SMILEY_SCALE);
 
-    // Hitbox: pbot.webp is 432x578 — a smiley face roughly centred in the
+    // Hitbox: smiley.webp is 432x578 — a smiley face roughly centred in the
     // frame. The body is a centred rect covering the visible face; the
     // padding around it is transparent and excluded from collisions.
-    this.pbot.body.setSize(280, 300);
-    this.pbot.body.setOffset(76, 139);
-    this.pbot.body.setCollideWorldBounds(false);
-    this.pbot.body.allowGravity = false; // turned on at first flap
+    this.smiley.body.setSize(280, 300);
+    this.smiley.body.setOffset(76, 139);
+    this.smiley.body.setCollideWorldBounds(false);
+    this.smiley.body.allowGravity = false; // turned on at first flap
 
     // sits above the scenery so the power-rush speed trail can render behind it
-    this.pbot.setDepth(5);
+    this.smiley.setDepth(5);
   }
 
   _createGroups() {
     this.pipes  = this.physics.add.group({ allowGravity: false, immovable: true });
     this.sushi = this.physics.add.group({ allowGravity: false });
 
-    this.physics.add.collider(this.pbot, this.pipes,   (_p, pillar) => this._onHitPillar(pillar));
-    this.physics.add.collider(this.pbot, this.floor,   () => this._endRound('crash'));
-    this.physics.add.collider(this.pbot, this.ceiling, () => this._endRound('crash'));
-    this.physics.add.overlap (this.pbot, this.sushi,  (_p, r) => this._collectSushi(r));
+    this.physics.add.collider(this.smiley, this.pipes,   (_p, pillar) => this._onHitPillar(pillar));
+    this.physics.add.collider(this.smiley, this.floor,   () => this._endRound('crash'));
+    this.physics.add.collider(this.smiley, this.ceiling, () => this._endRound('crash'));
+    this.physics.add.overlap (this.smiley, this.sushi,  (_p, r) => this._collectSushi(r));
   }
 
   _createHud() {
@@ -272,10 +272,10 @@ export class GameScene extends Phaser.Scene {
       duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
 
-    // gentle bob for pbot while waiting to start
+    // gentle bob for smiley while waiting to start
     this.idleBob = this.tweens.add({
-      targets: this.pbot,
-      y: this.pbot.y - 14,
+      targets: this.smiley,
+      y: this.smiley.y - 14,
       duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
   }
@@ -306,7 +306,7 @@ export class GameScene extends Phaser.Scene {
       onComplete: () => this.promptContainer.destroy(),
     });
 
-    this.pbot.body.allowGravity = true;
+    this.smiley.body.allowGravity = true;
     this.physics.world.gravity.y = GAME.gravity;
 
     // Magnet power-up — each roll has MAGNET.spawnChance to arm a magnet; the
@@ -375,20 +375,20 @@ export class GameScene extends Phaser.Scene {
 
   _flap() {
     if (this.gameOver) return;
-    this.pbot.body.setVelocityY(GAME.flapVelocity);
+    this.smiley.body.setVelocityY(GAME.flapVelocity);
     this.sound.play('jump', { volume: 0.4 });
     // small squash for feel
     this.tweens.add({
-      targets: this.pbot,
-      scaleX: PBOT_SCALE * 1.08,
-      scaleY: PBOT_SCALE * 0.92,
+      targets: this.smiley,
+      scaleX: SMILEY_SCALE * 1.08,
+      scaleY: SMILEY_SCALE * 0.92,
       duration: 80, yoyo: true, ease: 'Sine.easeOut',
     });
   }
 
   // Spawns a pillar pair. Options:
   //   safe   — widest gap, centred on the player (used for the first pair
-  //            after a power rush so the returning pillars can't clip pbot)
+  //            after a power rush so the returning pillars can't clip smiley)
   //   dropIn — the pair drops into frame from off-screen rather than
   //            scrolling in from the right edge
   _spawnPipePair(opts = {}) {
@@ -401,7 +401,7 @@ export class GameScene extends Phaser.Scene {
     const gap    = opts.safe ? DIFFICULTY.pipeGap.start : this._ramp(DIFFICULTY.pipeGap);
     const maxTop = pipeH - FLOOR_HEIGHT - gap - PIPE_BOTTOM_MARGIN;
     const gapTop = opts.safe
-      ? Phaser.Math.Clamp(this.pbot.y - gap / 2, PIPE_MIN_TOP, maxTop)
+      ? Phaser.Math.Clamp(this.smiley.y - gap / 2, PIPE_MIN_TOP, maxTop)
       : Phaser.Math.Between(PIPE_MIN_TOP, maxTop);
 
     // drop-in pairs land on-screen; normal pairs enter from the right edge
@@ -675,7 +675,7 @@ export class GameScene extends Phaser.Scene {
   // moves bubbles left, bobs them, and handles pickup / off-screen exit
   _updatePowerups(deltaMs) {
     const speed = this._currentSpeed();
-    const body  = this.pbot.body;
+    const body  = this.smiley.body;
 
     for (let i = this.powerups.length - 1; i >= 0; i -= 1) {
       const bubble = this.powerups[i];
@@ -683,7 +683,7 @@ export class GameScene extends Phaser.Scene {
       bubble.bobPhase += deltaMs / 1000;
       bubble.y = bubble.baseY + Math.sin(bubble.bobPhase * 2.4) * 8;
 
-      // pickup test: the bubble (a circle of grabRadius) vs pbot's actual
+      // pickup test: the bubble (a circle of grabRadius) vs smiley's actual
       // body rect, so any visible touch collects it — a plain centre-distance
       // check missed grabs where the player's edge clearly overlapped it.
       const grab = bubble.grabRadius;
@@ -759,14 +759,14 @@ export class GameScene extends Phaser.Scene {
   // while the magnet is active, every sushi homes in on the player
   _updateMagnetPull() {
     if (!this.magnetActive) return;
-    this.magnetAura.setPosition(this.pbot.x, this.pbot.y);
+    this.magnetAura.setPosition(this.smiley.x, this.smiley.y);
     this.sushi.children.iterate((r) => {
       if (!r) return;
       if (!r.magnetized) {
         r.magnetized = true;
         this.tweens.killTweensOf(r); // drop bob/spin so velocity controls it
       }
-      this.physics.moveToObject(r, this.pbot, MAGNET.pullSpeed);
+      this.physics.moveToObject(r, this.smiley, MAGNET.pullSpeed);
     });
   }
 
@@ -777,7 +777,7 @@ export class GameScene extends Phaser.Scene {
     aura.strokeCircle(0, 0, 46);
     aura.lineStyle(3, PALETTE.orange, 0.5);
     aura.strokeCircle(0, 0, 57);
-    aura.setPosition(this.pbot.x, this.pbot.y);
+    aura.setPosition(this.smiley.x, this.smiley.y);
     this.magnetAura = aura;
     this.magnetAuraTween = this.tweens.add({
       targets: aura,
@@ -952,11 +952,11 @@ export class GameScene extends Phaser.Scene {
     this._spawnSushiAt(this.scale.width + 30, y, this._currentSpeed(), false);
   }
 
-  // faint red afterimage of pbot, spawned on a throttle while rushing
+  // faint red afterimage of smiley, spawned on a throttle while rushing
   _spawnRushTrail() {
-    const ghost = this.add.image(this.pbot.x, this.pbot.y, 'pbot')
-      .setScale(this.pbot.scaleX, this.pbot.scaleY)
-      .setAngle(this.pbot.angle)
+    const ghost = this.add.image(this.smiley.x, this.smiley.y, 'smiley')
+      .setScale(this.smiley.scaleX, this.smiley.scaleY)
+      .setAngle(this.smiley.angle)
       .setAlpha(0.32)
       .setTint(0xff5a5a)
       .setDepth(4);
@@ -1019,12 +1019,12 @@ export class GameScene extends Phaser.Scene {
     this.sound.play('on-hit-2', { volume: 0.5 }); // death sound, kept quieter
 
     this._freezeGameplay();
-    this.pbot.setTexture('pbot-dead');
-    this.pbot.body.enable = false;
-    this.pbot.setDepth(150);
+    this.smiley.setTexture('smiley-dead');
+    this.smiley.body.enable = false;
+    this.smiley.setDepth(150);
 
-    const impactX = this.pbot.x;
-    const impactY = this.pbot.y;
+    const impactX = this.smiley.x;
+    const impactY = this.smiley.y;
 
     // Phase 1 — instant impact: white flash + first shake
     this.cameras.main.flash(100, 255, 255, 255);
@@ -1039,15 +1039,15 @@ export class GameScene extends Phaser.Scene {
       this._shatterPillar(pillar);
     });
 
-    // Phase 3 — pbot flies toward the camera with an afterimage trail
+    // Phase 3 — smiley flies toward the camera with an afterimage trail
     this.time.delayedCall(180, () => this._mascotFliesIntoScreen());
 
-    // Phase 4 — full-screen glass cracks when pbot "hits the screen"
+    // Phase 4 — full-screen glass cracks when smiley "hits the screen"
     this.time.delayedCall(880, () => {
       this.cameras.main.shake(520, 0.03);
       this._drawScreenCracks(this.scale.width / 2, this.scale.height / 2);
-      this.pbot.setTintFill(0xffffff);
-      this.time.delayedCall(90, () => this.pbot.setTint(0xff7766));
+      this.smiley.setTintFill(0xffffff);
+      this.time.delayedCall(90, () => this.smiley.setTint(0xff7766));
     });
 
     // Final hand-off
@@ -1083,9 +1083,9 @@ export class GameScene extends Phaser.Scene {
       if (r && r.body) r.body.setVelocity(0, 0);
     });
     this.physics.world.gravity.y = 0;
-    if (this.pbot.body) {
-      this.pbot.body.allowGravity = false;
-      this.pbot.body.setVelocity(0, 0);
+    if (this.smiley.body) {
+      this.smiley.body.allowGravity = false;
+      this.smiley.body.setVelocity(0, 0);
     }
   }
 
@@ -1176,7 +1176,7 @@ export class GameScene extends Phaser.Scene {
   _mascotFliesIntoScreen() {
     const targetX = this.scale.width / 2;
     const targetY = this.scale.height / 2;
-    const finalScale = PBOT_SCALE * 3.5; // ~0.7
+    const finalScale = SMILEY_SCALE * 3.5; // ~0.7
 
     // afterimage trail — 7 fading copies along the path
     let i = 0;
@@ -1184,9 +1184,9 @@ export class GameScene extends Phaser.Scene {
       delay: 55,
       repeat: 7,
       callback: () => {
-        const trail = this.add.image(this.pbot.x, this.pbot.y, this.pbot.texture.key)
-          .setScale(this.pbot.scaleX)
-          .setAngle(this.pbot.angle)
+        const trail = this.add.image(this.smiley.x, this.smiley.y, this.smiley.texture.key)
+          .setScale(this.smiley.scaleX)
+          .setAngle(this.smiley.angle)
           .setAlpha(0.45)
           .setTint(PALETTE.sushi)
           .setDepth(149);
@@ -1202,7 +1202,7 @@ export class GameScene extends Phaser.Scene {
 
     // the actual fly-in: scale up, rotate, drift to centre
     this.tweens.add({
-      targets: this.pbot,
+      targets: this.smiley,
       x: targetX,
       y: targetY,
       scaleX: finalScale,
@@ -1284,12 +1284,12 @@ export class GameScene extends Phaser.Scene {
     if (cause === 'crash') this.sound.play('on-hit-2', { volume: 0.5 });
 
     this._freezeGameplay();
-    this.pbot.setTexture('pbot-dead');
+    this.smiley.setTexture('smiley-dead');
 
     // brief death animation, then go to game over
     this.cameras.main.shake(220, 0.008);
     this.tweens.add({
-      targets: this.pbot,
+      targets: this.smiley,
       angle: '+=30',
       alpha: 0.5,
       duration: 400,

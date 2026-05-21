@@ -106,14 +106,14 @@ export class StartScene extends Phaser.Scene {
     });
   }
 
-  // pbot mascot — central, bobs gently and tilts.
+  // smiley mascot — central, bobs gently and tilts.
   _drawMascot(width, height) {
     const cx = width / 2;
     const my = height * 0.5;
 
-    const pbot = this.add.image(cx, my, 'pbot').setScale(0.32);
+    const smiley = this.add.image(cx, my, 'smiley').setScale(0.32);
     this.tweens.add({
-      targets: pbot,
+      targets: smiley,
       y: my - 18,
       duration: 1400,
       yoyo: true,
@@ -121,7 +121,7 @@ export class StartScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
     this.tweens.add({
-      targets: pbot,
+      targets: smiley,
       angle: { from: -6, to: 6 },
       duration: 2000,
       yoyo: true,

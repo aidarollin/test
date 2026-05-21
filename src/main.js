@@ -17,7 +17,7 @@ const config = {
   type: Phaser.AUTO,
   parent: 'game-canvas-wrap',
   backgroundColor: PALETTE_CSS.navy,
-  // Crisp nearest-neighbor scaling for pixel-art sprites (pbot et al.)
+  // Crisp nearest-neighbor scaling for pixel-art sprites (smiley et al.)
   pixelArt: true,
   roundPixels: true,
   scale: {
