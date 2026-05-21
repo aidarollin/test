@@ -58,7 +58,7 @@ export class StartScene extends Phaser.Scene {
 
     // tagline below the logo — stroked + shadowed so it reads on the
     // detailed background without a dimming overlay
-    this.add.text(cx, height * 0.42, 'Tap to fly  •  Collect sushi  •  Beat 3:00', {
+    this.add.text(cx, height * 0.42, 'Tap to fly  •  Eat sushi  •  We da best MUSIC!', {
       fontFamily: FONTS.ui,
       fontSize:   '16px',
       fontStyle:  'bold',
