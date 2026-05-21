@@ -1,11 +1,3 @@
-# Flying Sushi
-
-A Flappy-Bird-style arcade game with a Pandai twist. The mascot flies through
-a procedurally generated course, collecting sushi, with a fixed **3-minute
-round** before the run ends.
-
-Part of the [JDP Games](../) collection — published via GitHub Pages.
-
 ## Run it locally
 
 The game is a static site, so any local web server will work. For example:
@@ -48,7 +40,7 @@ swap them in without code changes:
 
 | Key      | File                        | Notes                                |
 |----------|-----------------------------|--------------------------------------|
-| `bird`   | `assets/sprites/bird.png`   | ~56×44 ideally, transparent          |
+| `smiley`   | `assets/sprites/smiley.png`   | ~56×44 ideally, transparent          |
 | `sushi`   | `assets/sprites/sushi.png`   | ~36×36, transparent                  |
 | `pipe`   | `assets/sprites/pipe.png`   | vertical, ~64 wide, ≥600 tall        |
 | `bg`     | `assets/backgrounds/sky.png`| 480×854 (or 2× = 960×1708)           |
