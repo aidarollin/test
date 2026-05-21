@@ -8,21 +8,21 @@ const PBOT_START_X       = 130;
 const PIPE_MIN_TOP       = 90;    // min y for bottom edge of top pipe
 const PIPE_BOTTOM_MARGIN = 60;    // min px between pipe gap and the floor
 
-// Rubies are drawn at an explicit display size so they render correctly
+// Sushi are drawn at an explicit display size so they render correctly
 // regardless of the source PNG's resolution.
-const RUBY_SIZE          = 44;    // gameplay ruby pickup, px
-const HUD_RUBY_SIZE      = 34;    // ruby icon in the HUD, px
+const SUSHI_SIZE          = 44;    // gameplay sushi pickup, px
+const HUD_SUSHI_SIZE      = 34;    // sushi icon in the HUD, px
 const MAGNET_SIZE        = 58;    // magnet power-up bubble, px
 
-// Ruby pickup formations — offsets are built in _spawnFormation().
-const LINE_SPACING       = 56;    // vertical gap between rubies in a line
+// Sushi pickup formations — offsets are built in _spawnFormation().
+const LINE_SPACING       = 56;    // vertical gap between sushi in a line
 const WAVE_LENGTH        = 184;   // horizontal span of an S-wave
 const WAVE_AMPLITUDE     = 78;    // vertical swing of an S-wave
-const CIRCLE_RADIUS      = 74;    // radius of a ruby ring
+const CIRCLE_RADIUS      = 74;    // radius of a sushi ring
 
 // Power Rush power-up.
 const RUSH_BUBBLE_SIZE   = 68;    // pwr orb display size, px
-const RUSH_SINE_WAVE     = 11;    // rubies per full cycle of the rush sine line
+const RUSH_SINE_WAVE     = 11;    // sushi per full cycle of the rush sine line
 const RAINBOW            = [      // sparkle hues ringing the rush bubble
   0xff3b3b, 0xff9e2c, 0xffe23d, 0x4cd964, 0x34c5e8, 0x4b7bec, 0xc44cff,
 ];
@@ -103,12 +103,12 @@ export class GameScene extends Phaser.Scene {
       const target = Phaser.Math.Clamp(vy * 0.08, -25, 70);
       this.pbot.angle += (target - this.pbot.angle) * 0.1;
 
-      // cleanup off-screen obstacles + rubies (kill tweens first so the
+      // cleanup off-screen obstacles + sushi (kill tweens first so the
       // spin/bob loops don't outlive the sprite)
       this.pipes.children.iterate((p) => {
         if (p && p.x < -100) p.destroy();
       });
-      this.rubies.children.iterate((r) => {
+      this.sushi.children.iterate((r) => {
         if (r && r.x < -40) { this.tweens.killTweensOf(r); r.destroy(); }
       });
 
@@ -193,12 +193,12 @@ export class GameScene extends Phaser.Scene {
 
   _createGroups() {
     this.pipes  = this.physics.add.group({ allowGravity: false, immovable: true });
-    this.rubies = this.physics.add.group({ allowGravity: false });
+    this.sushi = this.physics.add.group({ allowGravity: false });
 
     this.physics.add.collider(this.pbot, this.pipes,   (_p, pillar) => this._onHitPillar(pillar));
     this.physics.add.collider(this.pbot, this.floor,   () => this._endRound('crash'));
     this.physics.add.collider(this.pbot, this.ceiling, () => this._endRound('crash'));
-    this.physics.add.overlap (this.pbot, this.rubies,  (_p, r) => this._collectRuby(r));
+    this.physics.add.overlap (this.pbot, this.sushi,  (_p, r) => this._collectSushi(r));
   }
 
   _createHud() {
@@ -208,10 +208,10 @@ export class GameScene extends Phaser.Scene {
     this.add.rectangle(width / 2, HUD_HEIGHT / 2, width, HUD_HEIGHT,
       PALETTE.navy, 0.65).setDepth(50);
 
-    // ruby icon + count (left)
-    this.add.image(28, HUD_HEIGHT / 2, 'ruby')
-      .setDisplaySize(HUD_RUBY_SIZE, HUD_RUBY_SIZE).setDepth(51);
-    this.rubyText = this.add.text(50, HUD_HEIGHT / 2, '0', {
+    // sushi icon + count (left)
+    this.add.image(28, HUD_HEIGHT / 2, 'sushi')
+      .setDisplaySize(HUD_SUSHI_SIZE, HUD_SUSHI_SIZE).setDepth(51);
+    this.sushiText = this.add.text(50, HUD_HEIGHT / 2, '0', {
       fontFamily: FONTS.ui,
       fontSize:   '28px',
       fontStyle:  'bold',
@@ -233,13 +233,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   _updateHud() {
-    this.rubyText.setText(String(this.score));
+    this.sushiText.setText(String(this.score));
 
     const totalSec = Math.ceil(this.timeRemainingMs / 1000);
     const mm = Math.floor(totalSec / 60);
     const ss = (totalSec % 60).toString().padStart(2, '0');
     this.timeText.setText(`${mm}:${ss}`);
-    this.timeText.setColor(totalSec <= 10 ? PALETTE_CSS.ruby : PALETTE_CSS.yellow);
+    this.timeText.setColor(totalSec <= 10 ? PALETTE_CSS.sushi : PALETTE_CSS.yellow);
   }
 
   _createPrompt() {
@@ -259,7 +259,7 @@ export class GameScene extends Phaser.Scene {
       fontStyle:  'bold',
       color:      PALETTE_CSS.yellow,
     }).setOrigin(0.5);
-    const sub = this.add.text(0, 14, 'avoid obstacles  •  grab rubies', {
+    const sub = this.add.text(0, 14, 'avoid obstacles  •  grab sushi', {
       fontFamily: FONTS.ui,
       fontSize:   '12px',
       color:      PALETTE_CSS.white,
@@ -456,11 +456,11 @@ export class GameScene extends Phaser.Scene {
 
   // --- collectible spawning ----------------------------------------------
   // Every collectible is placed either inside a pillar gap or in the clear
-  // lane between two columns, so rubies and power-ups never overlap a pillar.
+  // lane between two columns, so sushi and power-ups never overlap a pillar.
 
   // Reward that rides in the gap of a freshly spawned pillar pair: nothing,
-  // a single ruby, or a compact vertical trio sized to fit the gap.
-  // Odds tuned for ~0.35 rubies per gap (40% below the earlier density).
+  // a single sushi, or a compact vertical trio sized to fit the gap.
+  // Odds tuned for ~0.35 sushi per gap (40% below the earlier density).
   _spawnGapReward(gapTop, gap, speed) {
     const roll = Math.random();
     if (roll < 0.79) return;                         // empty gap — a breather
@@ -468,19 +468,19 @@ export class GameScene extends Phaser.Scene {
     const cx = this.scale.width + 40;
     const cy = gapTop + gap / 2;
 
-    if (roll < 0.93) {                               // single ruby
-      this._spawnRubyAt(cx, cy, speed);
+    if (roll < 0.93) {                               // single sushi
+      this._spawnSushiAt(cx, cy, speed);
       return;
     }
     // vertical trio — spacing scaled so all three sit inside the gap
-    const spacing = Math.min(LINE_SPACING, (gap - RUBY_SIZE - 24) / 2);
+    const spacing = Math.min(LINE_SPACING, (gap - SUSHI_SIZE - 24) / 2);
     for (let i = -1; i <= 1; i += 1) {
-      this._spawnRubyAt(cx, cy + i * spacing, speed, false);
+      this._spawnSushiAt(cx, cy + i * spacing, speed, false);
     }
   }
 
   // Collectible for the clear lane between two pillar columns: a magnet (if
-  // one is armed), a single ruby, or a ruby formation.
+  // one is armed), a single sushi, or a sushi formation.
   _spawnLaneCollectible() {
     if (this.gameOver || this.rushActive) return;
     const speed = this._currentSpeed();
@@ -496,11 +496,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Odds tuned for ~0.9 rubies per lane (40% below the earlier density) —
+    // Odds tuned for ~0.9 sushi per lane (40% below the earlier density) —
     // most lanes are now empty, with formations kept but made rarer.
     const roll = Math.random();
     if (roll < 0.73) return;                         // empty lane — a breather
-    if (roll < 0.85) this._spawnRubyAt(this.scale.width + 30, this._laneY(RUBY_SIZE / 2), speed);
+    if (roll < 0.85) this._spawnSushiAt(this.scale.width + 30, this._laneY(SUSHI_SIZE / 2), speed);
     else if (roll < 0.91) this._spawnFormation('line5',  speed);
     else if (roll < 0.96) this._spawnFormation('wave',   speed);
     else                  this._spawnFormation('circle', speed);
@@ -514,10 +514,10 @@ export class GameScene extends Phaser.Scene {
     return Phaser.Math.Between(top, Math.max(top, bot));
   }
 
-  // Spawns a choreographed group of rubies. They all share one velocity, so
+  // Spawns a choreographed group of sushi. They all share one velocity, so
   // the shape holds together as it scrolls across the screen.
   //   line5  — vertical line of 5
-  //   wave   — 5 rubies along an S-curve
+  //   wave   — 5 sushi along an S-curve
   //   circle — ring of 6
   _spawnFormation(type, speed) {
     const W = this.scale.width;
@@ -540,31 +540,31 @@ export class GameScene extends Phaser.Scene {
         const a = (i / n) * Math.PI * 2 - Math.PI / 2;
         offsets.push({ dx: Math.cos(a) * CIRCLE_RADIUS, dy: Math.sin(a) * CIRCLE_RADIUS });
       }
-      anchorX = W + 30 + CIRCLE_RADIUS; // so the leftmost ruby starts off-screen
+      anchorX = W + 30 + CIRCLE_RADIUS; // so the leftmost sushi starts off-screen
       halfH = CIRCLE_RADIUS;
     }
 
-    const anchorY = this._laneY(halfH + RUBY_SIZE / 2);
+    const anchorY = this._laneY(halfH + SUSHI_SIZE / 2);
     offsets.forEach(({ dx, dy }) => {
-      this._spawnRubyAt(anchorX + dx, anchorY + dy, speed, false);
+      this._spawnSushiAt(anchorX + dx, anchorY + dy, speed, false);
     });
   }
 
-  // Creates one ruby. `bob` adds a gentle vertical drift — left off for
-  // formation rubies so the choreographed shape stays crisp.
-  _spawnRubyAt(x, y, speed, bob = true) {
-    const ruby = this.rubies.create(x, y, 'ruby').setDepth(11);
-    ruby.setDisplaySize(RUBY_SIZE, RUBY_SIZE);
-    ruby.body.setVelocityX(-speed);
-    ruby.body.setAllowGravity(false);
+  // Creates one sushi. `bob` adds a gentle vertical drift — left off for
+  // formation sushi so the choreographed shape stays crisp.
+  _spawnSushiAt(x, y, speed, bob = true) {
+    const sushi = this.sushi.create(x, y, 'sushi').setDepth(11);
+    sushi.setDisplaySize(SUSHI_SIZE, SUSHI_SIZE);
+    sushi.body.setVelocityX(-speed);
+    sushi.body.setAllowGravity(false);
     // Circular hitbox covering the gem, in texture-space units — the body
-    // scales with the sprite, so this stays correct at any RUBY_SIZE. 0.46
+    // scales with the sprite, so this stays correct at any SUSHI_SIZE. 0.46
     // of the texture width makes the pickup radius (~20px on screen) match
-    // the visible gem, so a graze that touches the ruby always collects it.
-    const r = ruby.width * 0.46;
-    ruby.body.setCircle(r, ruby.width / 2 - r, ruby.height / 2 - r);
+    // the visible gem, so a graze that touches the sushi always collects it.
+    const r = sushi.width * 0.46;
+    sushi.body.setCircle(r, sushi.width / 2 - r, sushi.height / 2 - r);
     this.tweens.add({
-      targets: ruby,
+      targets: sushi,
       angle: 360,
       duration: 1600,
       repeat: -1,
@@ -572,7 +572,7 @@ export class GameScene extends Phaser.Scene {
     });
     if (bob) {
       this.tweens.add({
-        targets: ruby,
+        targets: sushi,
         y: y - 8,
         duration: 900,
         yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
@@ -580,13 +580,13 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  _collectRuby(ruby) {
-    if (!ruby.active) return;
-    this.score += GAME.rubyValue;
+  _collectSushi(sushi) {
+    if (!sushi.active) return;
+    this.score += GAME.sushiValue;
     this.sound.play('collect', { volume: 0.55 });
     // sparkle pop
-    const pop = this.add.image(ruby.x, ruby.y, 'ruby').setDepth(20);
-    pop.setDisplaySize(RUBY_SIZE, RUBY_SIZE);
+    const pop = this.add.image(sushi.x, sushi.y, 'sushi').setDepth(20);
+    pop.setDisplaySize(SUSHI_SIZE, SUSHI_SIZE);
     this.tweens.add({
       targets: pop,
       scale: pop.scaleX * 2.2, alpha: 0,
@@ -594,7 +594,7 @@ export class GameScene extends Phaser.Scene {
       onComplete: () => pop.destroy(),
     });
     // floating "+1"
-    const plus = this.add.text(ruby.x, ruby.y, '+1', {
+    const plus = this.add.text(sushi.x, sushi.y, '+1', {
       fontFamily: FONTS.ui,
       fontSize:   '18px',
       fontStyle:  'bold',
@@ -604,17 +604,17 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(21);
     this.tweens.add({
       targets: plus,
-      y: ruby.y - 40, alpha: 0,
+      y: sushi.y - 40, alpha: 0,
       duration: 600, ease: 'Cubic.easeOut',
       onComplete: () => plus.destroy(),
     });
 
-    this.tweens.killTweensOf(ruby); // drop the spin/bob loop before destroying
-    ruby.destroy();
+    this.tweens.killTweensOf(sushi); // drop the spin/bob loop before destroying
+    sushi.destroy();
   }
 
   // --- magnet power-up ----------------------------------------------------
-  // A magnet "bubble" drifts in from the right like a ruby. It is a plain
+  // A magnet "bubble" drifts in from the right like a sushi. It is a plain
   // container (moved manually in _updatePowerups) so its bob never fights a
   // physics body; pickup is a simple distance check against the player.
   _spawnMagnet() {
@@ -745,9 +745,9 @@ export class GameScene extends Phaser.Scene {
   _deactivateMagnet() {
     this.magnetActive = false;
     this.magnetEndEvent = null;
-    // release rubies still in flight so they resume scrolling off-screen
+    // release sushi still in flight so they resume scrolling off-screen
     const speed = this._currentSpeed();
-    this.rubies.children.iterate((r) => {
+    this.sushi.children.iterate((r) => {
       if (r && r.magnetized) {
         r.magnetized = false;
         if (r.body) r.body.setVelocity(-speed, 0);
@@ -756,11 +756,11 @@ export class GameScene extends Phaser.Scene {
     this._hideMagnetAura();
   }
 
-  // while the magnet is active, every ruby homes in on the player
+  // while the magnet is active, every sushi homes in on the player
   _updateMagnetPull() {
     if (!this.magnetActive) return;
     this.magnetAura.setPosition(this.pbot.x, this.pbot.y);
-    this.rubies.children.iterate((r) => {
+    this.sushi.children.iterate((r) => {
       if (!r) return;
       if (!r.magnetized) {
         r.magnetized = true;
@@ -794,7 +794,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   // --- power rush power-up ------------------------------------------------
-  // Spawns the "pwr" bubble: a glossy orb wrapped in a pulsing red ruby glow
+  // Spawns the "pwr" bubble: a glossy orb wrapped in a pulsing red sushi glow
   // and a slowly-spinning ring of rainbow sparkles.
   _spawnRush() {
     const { width, height } = this.scale;
@@ -806,10 +806,10 @@ export class GameScene extends Phaser.Scene {
     bubble.bobPhase   = 0;
     bubble.grabRadius = RUSH_BUBBLE_SIZE * 0.55;
 
-    // red ruby-style glow — concentric rings that pulse
+    // red sushi-style glow — concentric rings that pulse
     const glow = this.add.graphics();
-    glow.fillStyle(PALETTE.ruby, 0.16); glow.fillCircle(0, 0, RUSH_BUBBLE_SIZE * 0.98);
-    glow.fillStyle(PALETTE.ruby, 0.26); glow.fillCircle(0, 0, RUSH_BUBBLE_SIZE * 0.74);
+    glow.fillStyle(PALETTE.sushi, 0.16); glow.fillCircle(0, 0, RUSH_BUBBLE_SIZE * 0.98);
+    glow.fillStyle(PALETTE.sushi, 0.26); glow.fillCircle(0, 0, RUSH_BUBBLE_SIZE * 0.74);
     glow.fillStyle(0xff5566,     0.34); glow.fillCircle(0, 0, RUSH_BUBBLE_SIZE * 0.56);
     bubble.add(glow);
     this.tweens.add({
@@ -889,13 +889,13 @@ export class GameScene extends Phaser.Scene {
     this._startRushVisuals();
     this.cameras.main.flash(240, 255, 210, 90);
 
-    // a sine line of rubies streamed evenly across the whole duration
+    // a sine line of sushi streamed evenly across the whole duration
     this.rushSinePhase = 0;
-    this._spawnRushRuby();
-    this.rushRubyTimer = this.time.addEvent({
-      delay: RUSH.durationMs / RUSH.rubyCount,
-      repeat: RUSH.rubyCount - 2,
-      callback: () => this._spawnRushRuby(),
+    this._spawnRushSushi();
+    this.rushSushiTimer = this.time.addEvent({
+      delay: RUSH.durationMs / RUSH.sushiCount,
+      repeat: RUSH.sushiCount - 2,
+      callback: () => this._spawnRushSushi(),
     });
 
     this.rushEndEvent = this.time.delayedCall(RUSH.durationMs, () => this._endRush());
@@ -905,7 +905,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.rushActive) return;
     this.rushActive   = false;
     this.rushEndEvent = null;
-    if (this.rushRubyTimer) { this.rushRubyTimer.remove(); this.rushRubyTimer = null; }
+    if (this.rushSushiTimer) { this.rushSushiTimer.remove(); this.rushSushiTimer = null; }
 
     this._stopRushVisuals();
 
@@ -939,17 +939,17 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  // One ruby on the power-rush sine line. Called on a fast timer — as each
-  // ruby scrolls left the stream traces a flowing sine wave across the screen.
-  _spawnRushRuby() {
+  // One sushi on the power-rush sine line. Called on a fast timer — as each
+  // sushi scrolls left the stream traces a flowing sine wave across the screen.
+  _spawnRushSushi() {
     if (this.gameOver) return;
     const top = HUD_HEIGHT + 60;
     const bot = this.scale.height - FLOOR_HEIGHT - 60;
     const cy  = (top + bot) / 2;
-    const amp = (bot - top) / 2 - RUBY_SIZE;
+    const amp = (bot - top) / 2 - SUSHI_SIZE;
     const y   = cy + amp * Math.sin(this.rushSinePhase);
     this.rushSinePhase += (Math.PI * 2) / RUSH_SINE_WAVE;
-    this._spawnRubyAt(this.scale.width + 30, y, this._currentSpeed(), false);
+    this._spawnSushiAt(this.scale.width + 30, y, this._currentSpeed(), false);
   }
 
   // faint red afterimage of pbot, spawned on a throttle while rushing
@@ -1069,7 +1069,7 @@ export class GameScene extends Phaser.Scene {
 
     // tear down any in-progress power rush
     if (this.rushTimer) this.rushTimer.remove();
-    if (this.rushRubyTimer) this.rushRubyTimer.remove();
+    if (this.rushSushiTimer) this.rushSushiTimer.remove();
     if (this.rushEndEvent) this.rushEndEvent.remove();
     if (this.rushRecoverEvent) this.rushRecoverEvent.remove();
     this.rushActive = false;
@@ -1078,7 +1078,7 @@ export class GameScene extends Phaser.Scene {
     this.pipes.children.iterate((p) => {
       if (p && p.body) p.body.setVelocity(0, 0);
     });
-    this.rubies.children.iterate((r) => {
+    this.sushi.children.iterate((r) => {
       if (r && r.body) r.body.setVelocity(0, 0);
     });
     this.physics.world.gravity.y = 0;
@@ -1187,7 +1187,7 @@ export class GameScene extends Phaser.Scene {
           .setScale(this.pbot.scaleX)
           .setAngle(this.pbot.angle)
           .setAlpha(0.45)
-          .setTint(PALETTE.ruby)
+          .setTint(PALETTE.sushi)
           .setDepth(149);
         this.tweens.add({
           targets: trail,

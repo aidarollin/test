@@ -8,7 +8,7 @@
 // localStorage *throw*, so every access is guarded.
 import { PALETTE } from './config.js';
 
-const MUTE_KEY = 'flying-ruby:muted';
+const MUTE_KEY = 'flying-sushi:muted';
 
 // in-session source of truth; mirrors localStorage when that is available
 let muteState = false;
@@ -73,7 +73,7 @@ export function addMuteButton(scene, x, y) {
 
   // red "x" — shown when muted
   const cross = scene.add.graphics();
-  cross.lineStyle(3, PALETTE.ruby, 1);
+  cross.lineStyle(3, PALETTE.sushi, 1);
   cross.beginPath(); cross.moveTo(3, -7);  cross.lineTo(13, 7); cross.strokePath();
   cross.beginPath(); cross.moveTo(13, -7); cross.lineTo(3, 7);  cross.strokePath();
   btn.add(cross);

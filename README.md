@@ -1,7 +1,7 @@
-# Flying Ruby
+# Flying Sushi
 
 A Flappy-Bird-style arcade game with a Pandai twist. The mascot flies through
-a procedurally generated course, collecting rubies, with a fixed **3-minute
+a procedurally generated course, collecting sushi, with a fixed **3-minute
 round** before the run ends.
 
 Part of the [JDP Games](../) collection — published via GitHub Pages.
@@ -11,7 +11,7 @@ Part of the [JDP Games](../) collection — published via GitHub Pages.
 The game is a static site, so any local web server will work. For example:
 
 ```bash
-# from inside the flying-ruby folder
+# from inside the flying-sushi folder
 python3 -m http.server 8080
 # then open http://localhost:8080
 ```
@@ -22,7 +22,7 @@ ES modules, which browsers only allow over `http://` (not `file://`).
 ## Project structure
 
 ```
-flying-ruby/
+flying-sushi/
 ├── index.html              # entry point — loads Phaser + main.js
 ├── src/
 │   ├── config.js           # palette + gameplay constants
@@ -33,7 +33,7 @@ flying-ruby/
 │       ├── GameScene.js    # gameplay (stub — full version next)
 │       └── GameOverScene.js  # results (stub — full version next)
 ├── assets/
-│   ├── sprites/            # bird, ruby, obstacles (PNG, ideally @2x)
+│   ├── sprites/            # bird, sushi, obstacles (PNG, ideally @2x)
 │   ├── backgrounds/        # parallax layers, sky, clouds
 │   ├── buttons/            # button states (idle / hover / pressed)
 │   └── ui/                 # icons, panels, numbers, fonts
@@ -49,7 +49,7 @@ swap them in without code changes:
 | Key      | File                        | Notes                                |
 |----------|-----------------------------|--------------------------------------|
 | `bird`   | `assets/sprites/bird.png`   | ~56×44 ideally, transparent          |
-| `ruby`   | `assets/sprites/ruby.png`   | ~36×36, transparent                  |
+| `sushi`   | `assets/sprites/sushi.png`   | ~36×36, transparent                  |
 | `pipe`   | `assets/sprites/pipe.png`   | vertical, ~64 wide, ≥600 tall        |
 | `bg`     | `assets/backgrounds/sky.png`| 480×854 (or 2× = 960×1708)           |
 | `btn-play` | `assets/buttons/play.png` | with idle/hover/pressed sprites      |
@@ -66,7 +66,7 @@ Sourced from the [Pandai Design System 1.5](https://www.figma.com/design/Y0DLhf2
 | navy        | `#020d26` | sky background, deep shadow    |
 | royalBlue   | `#1535a8` | mid sky, obstacles             |
 | darkRed     | `#a21520` | shadows, danger accents        |
-| ruby        | `#b81c26` | mascot, ruby pickups           |
+| sushi        | `#b81c26` | mascot, sushi pickups           |
 | yellow      | `#fdd83d` | highlights, buttons, score     |
 | orange      | `#ffb800` | glow, sun, accent              |
 

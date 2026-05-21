@@ -58,7 +58,7 @@ export class StartScene extends Phaser.Scene {
 
     // tagline below the logo — stroked + shadowed so it reads on the
     // detailed background without a dimming overlay
-    this.add.text(cx, height * 0.42, 'Tap to fly  •  Collect rubies  •  Beat 3:00', {
+    this.add.text(cx, height * 0.42, 'Tap to fly  •  Collect sushi  •  Beat 3:00', {
       fontFamily: FONTS.ui,
       fontSize:   '16px',
       fontStyle:  'bold',
@@ -129,10 +129,10 @@ export class StartScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    // orbiting ruby teaser
-    const ruby = this.add.image(cx + 100, my + 30, 'ruby').setDisplaySize(72, 72);
+    // orbiting sushi teaser
+    const sushi = this.add.image(cx + 100, my + 30, 'sushi').setDisplaySize(72, 72);
     this.tweens.add({
-      targets: ruby,
+      targets: sushi,
       x: cx - 100,
       y: my + 10,
       duration: 2400,
@@ -141,7 +141,7 @@ export class StartScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
     this.tweens.add({
-      targets: ruby,
+      targets: sushi,
       angle: 360,
       duration: 3000,
       repeat: -1,

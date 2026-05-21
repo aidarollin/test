@@ -1,7 +1,7 @@
 import { GAME, PALETTE, PALETTE_CSS, FONTS } from '../config.js';
 import { addMuteButton } from '../muteButton.js';
 
-const BEST_KEY = 'flying-ruby:best';
+const BEST_KEY = 'flying-sushi:best';
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -60,7 +60,7 @@ export class GameOverScene extends Phaser.Scene {
     const cx = width / 2;
     const isTimeUp = this.cause === 'time';
     const heading  = isTimeUp ? "TIME'S UP!" : 'GAME OVER';
-    const color    = isTimeUp ? PALETTE_CSS.yellow : PALETTE_CSS.ruby;
+    const color    = isTimeUp ? PALETTE_CSS.yellow : PALETTE_CSS.sushi;
     const strokeC  = isTimeUp ? PALETTE_CSS.darkRed : PALETTE_CSS.yellow;
 
     const title = this.add.text(cx, height * 0.18, heading, {
@@ -109,16 +109,16 @@ export class GameOverScene extends Phaser.Scene {
     panel.lineStyle(3, PALETTE.yellow, 0.55);
     panel.strokeRoundedRect(cx - pw / 2, py - ph / 2, pw, ph, 18);
 
-    // "RUBIES" label
-    this.add.text(cx, py - 80, 'RUBIES COLLECTED', {
+    // "SUSHI" label
+    this.add.text(cx, py - 80, 'SUSHI COLLECTED', {
       fontFamily: FONTS.ui,
       fontSize:   '13px',
       color:      PALETTE_CSS.white,
     }).setOrigin(0.5).setAlpha(0.75);
 
-    // big score with ruby icon
+    // big score with sushi icon
     const scoreRow = this.add.container(cx, py - 38);
-    const ruby = this.add.image(-58, 0, 'ruby').setDisplaySize(56, 56);
+    const sushi = this.add.image(-58, 0, 'sushi').setDisplaySize(56, 56);
     const num  = this.add.text(0, 0, String(this.score), {
       fontFamily: FONTS.ui,
       fontSize:   '64px',
@@ -127,7 +127,7 @@ export class GameOverScene extends Phaser.Scene {
       stroke:     PALETTE_CSS.darkRed,
       strokeThickness: 6,
     }).setOrigin(0, 0.5);
-    scoreRow.add([ruby, num]);
+    scoreRow.add([sushi, num]);
 
     // animate the count up from 0
     const counter = { v: 0 };
@@ -159,7 +159,7 @@ export class GameOverScene extends Phaser.Scene {
         fontFamily: FONTS.ui,
         fontSize:   '14px',
         fontStyle:  'bold',
-        color:      PALETTE_CSS.ruby,
+        color:      PALETTE_CSS.sushi,
         stroke:     PALETTE_CSS.yellow,
         strokeThickness: 3,
       }).setOrigin(0.5);
