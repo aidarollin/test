@@ -3,7 +3,7 @@ import { addMuteButton } from '../muteButton.js';
 
 const FLOOR_HEIGHT       = 80;
 const HUD_HEIGHT         = 70;
-const PBOT_SCALE         = 0.50;
+const PBOT_SCALE         = 0.35;
 const PBOT_START_X       = 130;
 const PIPE_MIN_TOP       = 90;    // min y for bottom edge of top pipe
 const PIPE_BOTTOM_MARGIN = 60;    // min px between pipe gap and the floor
@@ -179,11 +179,11 @@ export class GameScene extends Phaser.Scene {
     this.pbot = this.physics.add.image(PBOT_START_X, this.scale.height * 0.45, 'pbot')
       .setScale(PBOT_SCALE);
 
-    // Hitbox: pbot.webp is 98x134 — a smiley face that fills most of the
-    // frame, with a small antenna at the top. The body is inset from the
-    // edges and skips the antenna so collisions read off the visible face.
-    this.pbot.body.setSize(82, 108);
-    this.pbot.body.setOffset(8, 18);
+    // Hitbox: pbot.webp is 176x186 — a round face that fills most of the
+    // frame. The body is a slight inset of the visible face so collisions
+    // feel fair while still registering anywhere on the mascot.
+    this.pbot.body.setSize(148, 152);
+    this.pbot.body.setOffset(14, 17);
     this.pbot.body.setCollideWorldBounds(false);
     this.pbot.body.allowGravity = false; // turned on at first flap
 
