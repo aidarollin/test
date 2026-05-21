@@ -3,7 +3,7 @@ import { addMuteButton } from '../muteButton.js';
 
 const FLOOR_HEIGHT       = 80;
 const HUD_HEIGHT         = 70;
-const PBOT_SCALE         = 0.88;
+const PBOT_SCALE         = 0.50;
 const PBOT_START_X       = 130;
 const PIPE_MIN_TOP       = 90;    // min y for bottom edge of top pipe
 const PIPE_BOTTOM_MARGIN = 60;    // min px between pipe gap and the floor
