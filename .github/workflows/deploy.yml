@@ -1,9 +1,4 @@
-name: Deploy Flying Ruby to GitHub Pages
-
-# Flying Ruby is a static site (vanilla JS + Phaser from CDN, no build
-# step), so this just publishes the game files as-is. The previous
-# Vite-built "Ruby Blaster" project is preserved under zuma-clone/ and is
-# not deployed.
+name: Deploy test game
 
 on:
   push:
@@ -29,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Stage the Flying Ruby site
+      - name: Stage the game site
         run: |
           mkdir -p _site
           cp -r index.html README.md src assets bgm sfx _site/
